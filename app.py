@@ -1,3 +1,4 @@
+import datetime
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
@@ -13,6 +14,10 @@ def load_data():
 data = load_data()
 
 selected_company = st.selectbox(label="Company", options=data["Company"].unique(), index=None)
+
+default_date_start = datetime.date(2024, 1, 1)
+default_date_end = datetime.date(2024, 3, 1)
+selected_date_range = st.date_input("Date", (default_date_start, default_date_end), default_date_start, default_date_end)
 
 if selected_company != None:
     col1, col2 = st.columns(2)
