@@ -16,6 +16,7 @@ selected_company = st.selectbox(label="Company", options=data["Company"].unique(
 
 if selected_company != None:
     st.metric(label="Trips", value=data.groupby(["Company"]).size()[selected_company])
+    st.metric(label="Amount made", value='${:,.2f}'.format(data[data["Company"] == selected_company]["Trip Total"].sum()))
 
     pydeck_prepared_data = data[data["Company"] == selected_company].dropna(subset=["latitude"]).groupby(["latitude", "longitude"], as_index=False).size()
 
@@ -41,6 +42,7 @@ if selected_company != None:
     ))
 else:
     st.metric(label="Trips", value=data.groupby(["Company"]).size().sum())
+    st.metric(label="Amount made", value='${:,.2f}'.format(data["Trip Total"].sum()))
 
     pydeck_prepared_data = data.dropna(subset=["latitude"]).groupby(["latitude", "longitude"], as_index=False).size()
 
