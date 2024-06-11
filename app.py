@@ -51,9 +51,16 @@ else:
 
     with col1:
         st.metric(label="Trips", value=data.groupby(["Company"]).size().sum())
+        st.metric(label="Average fare", value='${:,.2f}'.format(20.33))
 
     with col2:
         st.metric(label="Amount made", value='${:,.2f}'.format(data["Trip Total"].sum()))
+        st.metric(label="Average tip", value='${:,.2f}'.format(2.15))
+
+    st.subheader("Most used payment types", divider="rainbow")
+    # Bar chart
+
+    # Map
 
     heatmap_prepared_data = data.dropna(subset=["latitude"]).groupby(["latitude", "longitude"], as_index=False).size()
 
@@ -79,12 +86,9 @@ else:
         ],
     ))
 
-    st.subheader("Average fare", divider="rainbow")
 
-    st.subheader("Average tip", divider="rainbow")
+    st.subheader("Fare map", divider="rainbow")
 
-    st.subheader("Most used payment types", divider="rainbow")
-    # Bar chart
+    st.subheader("Tip map", divider="rainbow")
 
-    # Map
 
