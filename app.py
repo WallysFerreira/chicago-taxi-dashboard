@@ -24,6 +24,9 @@ if selected_company != None:
 
     with col1:
         st.metric(label="Trips", value=data.groupby(["Company"]).size()[selected_company])
+        st.metric(label="Average fare", value='${:,.2f}'.format(data[data["Company"] == selected_company]["Fare"].mean()))
+        minutes, seconds = divmod(datetime.timedelta(seconds=data[data["Company"] == selected_company]["Trip Seconds"].mean()).seconds % 3600, 60)
+        st.metric(label="Average duration", value="{}m {}s".format(minutes, seconds))
 
     with col2:
         st.metric(label="Amount made", value='${:,.2f}'.format(data[data["Company"] == selected_company]["Trip Total"].sum()))
@@ -56,11 +59,14 @@ else:
 
     with col1:
         st.metric(label="Trips", value=data.groupby(["Company"]).size().sum())
-        st.metric(label="Average fare", value='${:,.2f}'.format(20.33))
+        st.metric(label="Average fare", value='${:,.2f}'.format(data["Fare"].mean()))
+        minutes, seconds = divmod(datetime.timedelta(seconds=data["Trip Seconds"].mean()).seconds % 3600, 60)
+        st.metric(label="Average duration", value="{}m {}s".format(minutes, seconds))
 
     with col2:
         st.metric(label="Amount made", value='${:,.2f}'.format(data["Trip Total"].sum()))
         st.metric(label="Average tip", value='${:,.2f}'.format(2.15))
+        st.metric(label="Average distance", value='{} miles'.format(6.56))
 
     st.subheader("Most used payment types", divider="rainbow")
     # Bar chart
@@ -95,5 +101,9 @@ else:
     st.subheader("Fare map", divider="rainbow")
 
     st.subheader("Tip map", divider="rainbow")
+
+    st.subheader("Duration map", divider="rainbow")
+
+    st.subheader("Distance map", divider="rainbow")
 
 
