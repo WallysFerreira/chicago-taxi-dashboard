@@ -33,6 +33,11 @@ if selected_company != None:
         st.metric(label="Average tip", value='${:,.2f}'.format(data[data["Company"] == selected_company]["Tips"].mean()))
         st.metric(label="Average distance", value='{:.2f} miles'.format(data[data["Company"] == selected_company]["Trip Miles"].mean()))
 
+    st.subheader("Most used payment types", divider="rainbow")
+    # Bar chart
+    st.bar_chart(data[data["Company"] == selected_company].groupby(["Payment Type"], as_index=False).size(), x="Payment Type", y="size", color="Payment Type", height=500)
+    # Map
+
     heatmap_prepared_data = data[data["Company"] == selected_company].dropna(subset=["latitude"]).groupby(["latitude", "longitude"], as_index=False).size()
 
     st.subheader("Trips heatmap", divider="rainbow")
@@ -72,6 +77,7 @@ else:
 
     st.subheader("Most used payment types", divider="rainbow")
     # Bar chart
+    st.bar_chart(data.groupby(["Payment Type"], as_index=False).size(), x="Payment Type", y="size", color="Payment Type", height=500)
 
     # Map
 
