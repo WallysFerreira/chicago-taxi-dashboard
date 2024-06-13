@@ -48,9 +48,19 @@ if selected_company != None:
         st.metric(label="Average distance", value='{:.2f} miles'.format(data[data["Company"] == selected_company]["Trip Miles"].mean()))
 
     st.subheader("Most used payment types", divider="rainbow")
+
     # Bar chart
-    st.bar_chart(data[data["Company"] == selected_company].groupby(["Payment Type"], as_index=False).size(), x="Payment Type", y="size", color="Payment Type", height=500)
+    payment_bar_data = data[data["Company"] == selected_company].groupby(["Payment Type"], as_index=False).size();
+    payment_bar_data["color"] = payment_bar_data.apply(apply_color, axis=1)
+
+    st.altair_chart(alt.Chart(payment_bar_data).mark_bar().encode(x="Payment Type", y="size", color=alt.Color("color").scale(None)).properties(height=500), use_container_width=True)
+
     # Map
+    payment_map_data = data[data["Company"] == selected_company].groupby(["latitude", "longitude"], as_index=False)["Payment Type"].agg(pd.Series.mode)
+    payment_map_data["Payment Type"] = payment_map_data["Payment Type"].map(lambda val : val if(isinstance(val, str)) else val[0])
+    payment_map_data["color"] = payment_map_data.apply(apply_color, 1)
+
+    st.map(payment_map_data, color="color", size=300)
 
     heatmap_prepared_data = data[data["Company"] == selected_company].dropna(subset=["latitude"]).groupby(["latitude", "longitude"], as_index=False).size()
 
