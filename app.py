@@ -209,149 +209,171 @@ else:
         st.metric(label="Average tip", value='${:,.2f}'.format(data["Tips"].mean()))
         st.metric(label="Average distance", value='{:.2f} miles'.format(data["Trip Miles"].mean()))
 
-    st.subheader("Most used payment types", divider="rainbow")
+    general_tab, companies_tab = st.tabs(["General", "Compare companies"])
 
-    # Bar chart
-    payment_bar_data = data.groupby(["Payment Type"], as_index=False).size();
-    payment_bar_data["color"] = payment_bar_data.apply(apply_color, axis=1)
+    with general_tab:
+        st.subheader("Most used payment types", divider="rainbow")
 
-    st.altair_chart(alt.Chart(payment_bar_data).mark_bar().encode(x="Payment Type", y="size", color=alt.Color("color").scale(None)).properties(height=500), use_container_width=True)
+        # Bar chart
+        payment_bar_data = data.groupby(["Payment Type"], as_index=False).size();
+        payment_bar_data["color"] = payment_bar_data.apply(apply_color, axis=1)
 
-    # Map
-    payment_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Payment Type"].agg(pd.Series.mode)
-    payment_map_data["Payment Type"] = payment_map_data["Payment Type"].map(lambda val : val if(isinstance(val, str)) else val[0])
-    payment_map_data["color"] = payment_map_data.apply(apply_color, 1)
+        st.altair_chart(alt.Chart(payment_bar_data).mark_bar().encode(x="Payment Type", y="size", color=alt.Color("color").scale(None)).properties(height=500), use_container_width=True)
 
-    st.map(payment_map_data, color="color", size=300)
+        # Map
+        payment_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Payment Type"].agg(pd.Series.mode)
+        payment_map_data["Payment Type"] = payment_map_data["Payment Type"].map(lambda val : val if(isinstance(val, str)) else val[0])
+        payment_map_data["color"] = payment_map_data.apply(apply_color, 1)
 
-    heatmap_prepared_data = data.dropna(subset=["latitude"]).groupby(["latitude", "longitude"], as_index=False).size()
+        st.map(payment_map_data, color="color", size=300)
 
-    st.subheader("Trips heatmap", divider="rainbow")
-    st.pydeck_chart(pdk.Deck(
-        map_style=None,
-        initial_view_state=pdk.ViewState(
-            latitude=41.876984,
-            longitude=-87.629704,
-            zoom=8.5,
-            pitch=0,
-        ),
-        layers=[
-            pdk.Layer(
-                'HeatmapLayer',
-                data=heatmap_prepared_data,
-                get_position='[longitude, latitude]',
-                radius=500,
-                get_weight='size',
-                pickable=False,
-                extruded=True,
+        heatmap_prepared_data = data.dropna(subset=["latitude"]).groupby(["latitude", "longitude"], as_index=False).size()
+
+        st.subheader("Trips heatmap", divider="rainbow")
+        st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=41.876984,
+                longitude=-87.629704,
+                zoom=8.5,
+                pitch=0,
             ),
-        ],
-    ))
+            layers=[
+                pdk.Layer(
+                    'HeatmapLayer',
+                    data=heatmap_prepared_data,
+                    get_position='[longitude, latitude]',
+                    radius=500,
+                    get_weight='size',
+                    pickable=False,
+                    extruded=True,
+                ),
+            ],
+        ))
 
 
-    st.subheader("Fare map", divider="rainbow")
+        st.subheader("Fare map", divider="rainbow")
 
-    fare_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Fare"].mean()
+        fare_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Fare"].mean()
 
-    st.pydeck_chart(pdk.Deck(
-        map_style=None,
-        initial_view_state=pdk.ViewState(
-            latitude=41.876984,
-            longitude=-87.629704,
-            zoom=8.5,
-            pitch=55,
-        ),
-        layers=[
-            pdk.Layer(
-                'ColumnLayer',
-                data=fare_map_data,
-                extruded=True,
-                get_position='[longitude, latitude]',
-                radius=400,
-                get_elevation="Fare",
-                elevation_scale=100,
-                get_fill_color=['Fare / 3', 0, 'Fare * 2'],
-            )
-        ]
-    ))
+        st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=41.876984,
+                longitude=-87.629704,
+                zoom=8.5,
+                pitch=55,
+            ),
+            layers=[
+                pdk.Layer(
+                    'ColumnLayer',
+                    data=fare_map_data,
+                    extruded=True,
+                    get_position='[longitude, latitude]',
+                    radius=400,
+                    get_elevation="Fare",
+                    elevation_scale=100,
+                    get_fill_color=['Fare / 3', 0, 'Fare * 2'],
+                )
+            ]
+        ))
 
-    st.subheader("Tips map", divider="rainbow")
+        st.subheader("Tips map", divider="rainbow")
 
-    tips_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Tips"].mean()
+        tips_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Tips"].mean()
 
-    st.pydeck_chart(pdk.Deck(
-        map_style=None,
-        initial_view_state=pdk.ViewState(
-            latitude=41.876984,
-            longitude=-87.629704,
-            zoom=8.2,
-            pitch=55,
-        ),
-        layers=[
-            pdk.Layer(
-                'ColumnLayer',
-                data=tips_map_data,
-                extruded=True,
-                get_position='[longitude, latitude]',
-                radius=400,
-                get_elevation="Tips",
-                elevation_scale=1500,
-                get_fill_color=['Tips * 7 / 2', 0, 'Tips * 60'],
-            )
-        ]
-    ))
+        st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=41.876984,
+                longitude=-87.629704,
+                zoom=8.2,
+                pitch=55,
+            ),
+            layers=[
+                pdk.Layer(
+                    'ColumnLayer',
+                    data=tips_map_data,
+                    extruded=True,
+                    get_position='[longitude, latitude]',
+                    radius=400,
+                    get_elevation="Tips",
+                    elevation_scale=1500,
+                    get_fill_color=['Tips * 7 / 2', 0, 'Tips * 60'],
+                )
+            ]
+        ))
 
-    st.subheader("Duration map", divider="rainbow")
+        st.subheader("Duration map", divider="rainbow")
 
-    duration_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Trip Seconds"].mean()
-    duration_map_data["time"] = duration_map_data["Trip Seconds"]
-    
-    st.pydeck_chart(pdk.Deck(
-        map_style=None,
-        initial_view_state=pdk.ViewState(
-            latitude=41.876984,
-            longitude=-87.629704,
-            zoom=8.5,
-            pitch=50,
-        ),
-        layers=[
-            pdk.Layer(
-                'ColumnLayer',
-                data=duration_map_data,
-                extruded=True,
-                get_position='[longitude, latitude]',
-                radius=200,
-                get_elevation="time",
-                elevation_scale=5,
-                get_fill_color=['time / 10', 0, 'time * 5'],
-            )
-        ]
-    ))
+        duration_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Trip Seconds"].mean()
+        duration_map_data["time"] = duration_map_data["Trip Seconds"]
+        
+        st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=41.876984,
+                longitude=-87.629704,
+                zoom=8.5,
+                pitch=50,
+            ),
+            layers=[
+                pdk.Layer(
+                    'ColumnLayer',
+                    data=duration_map_data,
+                    extruded=True,
+                    get_position='[longitude, latitude]',
+                    radius=200,
+                    get_elevation="time",
+                    elevation_scale=5,
+                    get_fill_color=['time / 10', 0, 'time * 5'],
+                )
+            ]
+        ))
 
-    st.subheader("Distance map", divider="rainbow")
+        st.subheader("Distance map", divider="rainbow")
 
-    distance_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Trip Miles"].mean()
-    distance_map_data["distance"] = distance_map_data["Trip Miles"]
+        distance_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Trip Miles"].mean()
+        distance_map_data["distance"] = distance_map_data["Trip Miles"]
 
-    st.pydeck_chart(pdk.Deck(
-        map_style=None,
-        initial_view_state=pdk.ViewState(
-            latitude=41.876984,
-            longitude=-87.629704,
-            zoom=8.5,
-            pitch=50,
-        ),
-        layers=[
-            pdk.Layer(
-                'ColumnLayer',
-                data=distance_map_data,
-                extruded=True,
-                get_position='[longitude, latitude]',
-                radius=200,
-                get_elevation="distance",
-                elevation_scale=1100,
-                get_fill_color=['distance * 10', 0, 'distance * 50'],
-            )
-        ]
-    ))
+        st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=41.876984,
+                longitude=-87.629704,
+                zoom=8.5,
+                pitch=50,
+            ),
+            layers=[
+                pdk.Layer(
+                    'ColumnLayer',
+                    data=distance_map_data,
+                    extruded=True,
+                    get_position='[longitude, latitude]',
+                    radius=200,
+                    get_elevation="distance",
+                    elevation_scale=1100,
+                    get_fill_color=['distance * 10', 0, 'distance * 50'],
+                )
+            ]
+        ))
+
+    with companies_tab:
+        company_trips_data = data.groupby(["Company"], as_index=False).size().sort_values(by=["size"], ascending=False)[0:8]
+        st.altair_chart(alt.Chart(company_trips_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="size", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+
+        company_amount_data = data.groupby(["Company"], as_index=False)["Trip Total"].sum().sort_values(by=["Trip Total"], ascending=False)[0:8]
+        st.altair_chart(alt.Chart(company_amount_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Trip Total", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+
+        average_fare_data = data.groupby(["Company"], as_index=False)["Fare"].mean().sort_values(by=["Fare"], ascending=False)[0:8]
+        st.altair_chart(alt.Chart(average_fare_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Fare", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+
+        average_seconds_data = data.groupby(["Company"], as_index=False)["Trip Seconds"].mean().sort_values(by=["Trip Seconds"], ascending=False)[0:8]
+        st.altair_chart(alt.Chart(average_seconds_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Trip Seconds", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+
+        average_tips_data = data.groupby(["Company"], as_index=False)["Tips"].mean().sort_values(by=["Tips"], ascending=False)[0:8]
+        st.altair_chart(alt.Chart(average_tips_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Tips", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+
+        average_distance_data = data.groupby(["Company"], as_index=False)["Trip Miles"].mean().sort_values(by=["Trip Miles"], ascending=False)[0:8]
+        st.altair_chart(alt.Chart(average_distance_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Trip Miles", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
