@@ -115,7 +115,7 @@ if selected_company != None:
         ]
     ))
 
-    st.subheader("Tip map", divider="rainbow")
+    st.subheader("Tips map", divider="rainbow")
 
     tips_map_data = data[data["Company"] == selected_company].groupby(["latitude", "longitude"], as_index=False)["Tips"].mean()
 
@@ -221,7 +221,7 @@ else:
         ]
     ))
 
-    st.subheader("Tip map", divider="rainbow")
+    st.subheader("Tips map", divider="rainbow")
 
     tips_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Tips"].mean()
 
