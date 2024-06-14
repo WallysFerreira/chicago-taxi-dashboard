@@ -141,6 +141,33 @@ if selected_company != None:
         ]
     ))
 
+    st.subheader("Duration map", divider="rainbow")
+
+    duration_map_data = data[data["Company"] == selected_company].groupby(["latitude", "longitude"], as_index=False)["Trip Seconds"].mean()
+    duration_map_data["time"] = duration_map_data["Trip Seconds"]
+    
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.5,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=duration_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=200,
+                get_elevation="time",
+                elevation_scale=5,
+                get_fill_color=['time / 10', 0, 'time * 5'],
+            )
+        ]
+    ))
+
 else:
     col1, col2 = st.columns(2)
 
@@ -248,6 +275,31 @@ else:
     ))
 
     st.subheader("Duration map", divider="rainbow")
+
+    duration_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Trip Seconds"].mean()
+    duration_map_data["time"] = duration_map_data["Trip Seconds"]
+    
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.5,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=duration_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=200,
+                get_elevation="time",
+                elevation_scale=5,
+                get_fill_color=['time / 10', 0, 'time * 5'],
+            )
+        ]
+    ))
 
     st.subheader("Distance map", divider="rainbow")
 
