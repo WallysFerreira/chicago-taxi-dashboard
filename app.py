@@ -17,6 +17,9 @@ def apply_color(row):
 
     return colors[row["Payment Type"]]
 
+def get_fare_column_color(row):
+    return [100, 0, 0]
+
 @st.cache_data
 def load_data():
     url = "https://www.dropbox.com/scl/fi/ftt2wzhzpjbemcovcayl0/taxi-trips.csv?rlkey=sxyqqsdmoug4mhpb1raiiugws&st=zy6h9ru0&dl=1"
@@ -85,6 +88,33 @@ if selected_company != None:
             ),
         ],
     ))
+
+    st.subheader("Fare map", divider="rainbow")
+
+    fare_map_data = data[data["Company"] == selected_company].groupby(["latitude", "longitude"], as_index=False)["Fare"].mean()
+
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.5,
+            pitch=55,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=fare_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=400,
+                get_elevation="Fare",
+                elevation_scale=200,
+                get_fill_color=['Fare / 3', 0, 'Fare * 2'],
+            )
+        ]
+    ))
+
 else:
     col1, col2 = st.columns(2)
 
@@ -140,6 +170,30 @@ else:
 
 
     st.subheader("Fare map", divider="rainbow")
+
+    fare_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Fare"].mean()
+
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.5,
+            pitch=55,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=fare_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=400,
+                get_elevation="Fare",
+                elevation_scale=100,
+                get_fill_color=['Fare / 3', 0, 'Fare * 2'],
+            )
+        ]
+    ))
 
     st.subheader("Tip map", divider="rainbow")
 
