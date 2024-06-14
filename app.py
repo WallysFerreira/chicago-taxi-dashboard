@@ -168,6 +168,33 @@ if selected_company != None:
         ]
     ))
 
+    st.subheader("Distance map", divider="rainbow")
+
+    distance_map_data = data[data["Company"] == selected_company].groupby(["latitude", "longitude"], as_index=False)["Trip Miles"].mean()
+    distance_map_data["distance"] = distance_map_data["Trip Miles"]
+
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.5,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=distance_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=200,
+                get_elevation="distance",
+                elevation_scale=1100,
+                get_fill_color=['distance * 10', 0, 'distance * 50'],
+            )
+        ]
+    ))
+
 else:
     col1, col2 = st.columns(2)
 
@@ -303,4 +330,28 @@ else:
 
     st.subheader("Distance map", divider="rainbow")
 
+    distance_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Trip Miles"].mean()
+    distance_map_data["distance"] = distance_map_data["Trip Miles"]
+
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.5,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=distance_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=200,
+                get_elevation="distance",
+                elevation_scale=1100,
+                get_fill_color=['distance * 10', 0, 'distance * 50'],
+            )
+        ]
+    ))
 
