@@ -115,6 +115,32 @@ if selected_company != None:
         ]
     ))
 
+    st.subheader("Tip map", divider="rainbow")
+
+    tips_map_data = data[data["Company"] == selected_company].groupby(["latitude", "longitude"], as_index=False)["Tips"].mean()
+
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.2,
+            pitch=55,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=tips_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=400,
+                get_elevation="Tips",
+                elevation_scale=1500,
+                get_fill_color=['Tips * 7 / 2', 0, 'Tips * 60'],
+            )
+        ]
+    ))
+
 else:
     col1, col2 = st.columns(2)
 
@@ -196,6 +222,30 @@ else:
     ))
 
     st.subheader("Tip map", divider="rainbow")
+
+    tips_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Tips"].mean()
+
+    st.pydeck_chart(pdk.Deck(
+        map_style=None,
+        initial_view_state=pdk.ViewState(
+            latitude=41.876984,
+            longitude=-87.629704,
+            zoom=8.2,
+            pitch=55,
+        ),
+        layers=[
+            pdk.Layer(
+                'ColumnLayer',
+                data=tips_map_data,
+                extruded=True,
+                get_position='[longitude, latitude]',
+                radius=400,
+                get_elevation="Tips",
+                elevation_scale=1500,
+                get_fill_color=['Tips * 7 / 2', 0, 'Tips * 60'],
+            )
+        ]
+    ))
 
     st.subheader("Duration map", divider="rainbow")
 
