@@ -30,6 +30,7 @@ def load_data():
     data.loc[data["Company"] == "Choice Taxi Association Inc", "Company"] = "Choice Taxi Association"
     data.loc[data["Company"] == "Blue Ribbon Taxi Association Inc.", "Company"] = "Blue Ribbon Taxi Association"
     data.loc[data["Company"] == "Taxi Affiliation Services Llc - Yell", "Company"] = "Taxi Affiliation Services"
+
     return data
 
 data = load_data()
