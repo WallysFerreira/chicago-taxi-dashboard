@@ -26,11 +26,16 @@ def load_data():
     data = pd.read_csv(url)
     data = data.rename(columns={"Pickup Centroid Latitude": "latitude", "Pickup Centroid Longitude": "longitude"})
 
+    data.loc[data["Company"] == "Taxicab Insurance Agency Llc", "Company"] = "Taxicab Insurance Agency, LLC"
+    data.loc[data["Company"] == "Choice Taxi Association Inc", "Company"] = "Choice Taxi Association"
+    data.loc[data["Company"] == "Blue Ribbon Taxi Association Inc.", "Company"] = "Blue Ribbon Taxi Association"
+    data.loc[data["Company"] == "Taxi Affiliation Services Llc - Yell", "Company"] = "Taxi Affiliation Services"
+
     return data
 
 data = load_data()
 
-selected_company = st.selectbox(label="Company", options=data["Company"].unique(), index=None)
+selected_company = st.selectbox(label="Company", options=data["Company"].sort_values().unique(), index=None)
 
 default_date_start = datetime.date(2024, 1, 1)
 default_date_end = datetime.date(2024, 3, 1)
