@@ -17,6 +17,10 @@ def apply_color(row):
 
     return colors[row["Payment Type"]]
 
+def apply_weekday(row):
+    parsed_timestamp = datetime.datetime.strptime(row["Trip Start Timestamp"], "%m/%d/%Y %I:%M:%S %p")
+
+    return parsed_timestamp.strftime("%A")
 @st.cache_data
 def load_data():
     url = "https://www.dropbox.com/scl/fi/ftt2wzhzpjbemcovcayl0/taxi-trips.csv?rlkey=sxyqqsdmoug4mhpb1raiiugws&st=zy6h9ru0&dl=1"
