@@ -223,7 +223,7 @@ else:
         payment_bar_data = data.groupby(["Payment Type"], as_index=False).size();
         payment_bar_data["color"] = payment_bar_data.apply(apply_color, axis=1)
 
-        st.altair_chart(alt.Chart(payment_bar_data).mark_bar().encode(x="Payment Type", y="size", color=alt.Color("color").scale(None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(payment_bar_data).mark_bar().encode(x="Payment Type", y=alt.Y("size", title="Times used"), color=alt.Color("color").scale(None)).properties(height=500), use_container_width=True)
 
         # Map
         payment_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Payment Type"].agg(pd.Series.mode)
@@ -365,20 +365,20 @@ else:
 
     with companies_tab:
         company_trips_data = data.groupby(["Company"], as_index=False).size().sort_values(by=["size"], ascending=False)[0:8]
-        st.altair_chart(alt.Chart(company_trips_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="size", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(company_trips_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("size", title="Trips completed"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
         company_amount_data = data.groupby(["Company"], as_index=False)["Trip Total"].sum().sort_values(by=["Trip Total"], ascending=False)[0:8]
-        st.altair_chart(alt.Chart(company_amount_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Trip Total", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(company_amount_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("Trip Total", title="Amount made (dollars)"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
         average_fare_data = data.groupby(["Company"], as_index=False)["Fare"].mean().sort_values(by=["Fare"], ascending=False)[0:8]
-        st.altair_chart(alt.Chart(average_fare_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Fare", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(average_fare_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("Fare", title="Average fare (dollars)"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
         average_seconds_data = data.groupby(["Company"], as_index=False)["Trip Seconds"].mean().sort_values(by=["Trip Seconds"], ascending=False)[0:8]
-        st.altair_chart(alt.Chart(average_seconds_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Trip Seconds", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(average_seconds_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("Trip Seconds", title="Average trip duration (seconds)"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
         average_tips_data = data.groupby(["Company"], as_index=False)["Tips"].mean().sort_values(by=["Tips"], ascending=False)[0:8]
-        st.altair_chart(alt.Chart(average_tips_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Tips", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(average_tips_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("Tips", title="Average tip (dollars)"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
         average_distance_data = data.groupby(["Company"], as_index=False)["Trip Miles"].mean().sort_values(by=["Trip Miles"], ascending=False)[0:8]
-        st.altair_chart(alt.Chart(average_distance_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y="Trip Miles", color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(average_distance_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("Trip Miles", title="Average distance (miles)"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
