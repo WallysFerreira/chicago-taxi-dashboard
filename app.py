@@ -17,9 +17,6 @@ def apply_color(row):
 
     return colors[row["Payment Type"]]
 
-def get_fare_column_color(row):
-    return [100, 0, 0]
-
 @st.cache_data
 def load_data():
     url = "https://www.dropbox.com/scl/fi/ftt2wzhzpjbemcovcayl0/taxi-trips.csv?rlkey=sxyqqsdmoug4mhpb1raiiugws&st=zy6h9ru0&dl=1"
@@ -40,6 +37,9 @@ selected_company = st.selectbox(label="Company", options=data["Company"].sort_va
 default_date_start = datetime.date(2024, 1, 1)
 default_date_end = datetime.date(2024, 3, 1)
 selected_date_range = st.date_input("Date", (default_date_start, default_date_end), default_date_start, default_date_end)
+
+selected_date_start, selected_date_end = selected_date_range
+data = data[(data["Trip Start Timestamp"] >= selected_date_start.strftime("%m/%d/%Y %I:%M:%S %p")) & (data["Trip Start Timestamp"] <= selected_date_end.strftime("%m/%d/%Y %I:%M:%S %p"))]
 
 if selected_company != None:
     col1, col2 = st.columns(2)
