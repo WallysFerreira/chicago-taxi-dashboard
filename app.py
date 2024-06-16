@@ -221,7 +221,7 @@ else:
         st.metric(label="Average tip", value='${:,.2f}'.format(data["Tips"].mean()))
         st.metric(label="Average distance", value='{:.2f} miles'.format(data["Trip Miles"].mean()))
 
-    general_tab, companies_tab = st.tabs(["General", "Compare companies"])
+    general_tab, companies_tab, weekdays_tab = st.tabs(["General", "Compare companies", "Weekdays"])
 
     with general_tab:
         st.subheader("Most used payment types", divider="rainbow")
@@ -389,3 +389,6 @@ else:
         average_distance_data = data.groupby(["Company"], as_index=False)["Trip Miles"].mean().sort_values(by=["Trip Miles"], ascending=False)[0:8]
         st.altair_chart(alt.Chart(average_distance_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("Trip Miles", title="Average distance (miles)"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
+    with weekdays_tab:
+        trips_per_weekday_data = data.groupby(["Weekday"], as_index=False).size()
+        st.altair_chart(alt.Chart(trips_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort="-y"), y=alt.Y("size", title="Trips completed"), color=alt.Color("Weekday", legend=None)).properties(height=500), use_container_width=True)
