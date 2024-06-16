@@ -21,6 +21,7 @@ def apply_weekday(row):
     parsed_timestamp = datetime.datetime.strptime(row["Trip Start Timestamp"], "%m/%d/%Y %I:%M:%S %p")
 
     return parsed_timestamp.strftime("%A")
+
 @st.cache_data
 def load_data():
     url = "https://www.dropbox.com/scl/fi/ftt2wzhzpjbemcovcayl0/taxi-trips.csv?rlkey=sxyqqsdmoug4mhpb1raiiugws&st=zy6h9ru0&dl=1"
@@ -31,6 +32,8 @@ def load_data():
     data.loc[data["Company"] == "Choice Taxi Association Inc", "Company"] = "Choice Taxi Association"
     data.loc[data["Company"] == "Blue Ribbon Taxi Association Inc.", "Company"] = "Blue Ribbon Taxi Association"
     data.loc[data["Company"] == "Taxi Affiliation Services Llc - Yell", "Company"] = "Taxi Affiliation Services"
+
+    data["Weekday"] = data.apply(apply_weekday, 1)
 
     return data
 
