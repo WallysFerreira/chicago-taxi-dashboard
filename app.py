@@ -4,7 +4,7 @@ import pandas as pd
 import pydeck as pdk
 import altair as alt
 
-def apply_color(row):
+def apply_color_payment(row):
     colors = {
         "Cash": "#e81416",
         "Credit Card": "#ffa500",
@@ -16,6 +16,19 @@ def apply_color(row):
     }
 
     return colors[row["Payment Type"]]
+
+def apply_color_weekday(row):
+    colors = {
+        "Sunday": "#ff2b2b",
+        "Monday": "#092d52",
+        "Tuesday": "#29b09d",
+        "Wednesday": "#ffd16a",
+        "Thursday": "#7defa1",
+        "Friday": "#83c9ff",
+        "Saturday": "#ffabab",
+    }
+
+    return colors[row["Weekday"]]
 
 def apply_weekday(row):
     parsed_timestamp = datetime.datetime.strptime(row["Trip Start Timestamp"], "%m/%d/%Y %I:%M:%S %p")
@@ -66,14 +79,14 @@ if selected_company != None:
 
     # Bar chart
     payment_bar_data = data[data["Company"] == selected_company].groupby(["Payment Type"], as_index=False).size();
-    payment_bar_data["color"] = payment_bar_data.apply(apply_color, axis=1)
+    payment_bar_data["color"] = payment_bar_data.apply(apply_color_payment, axis=1)
 
     st.altair_chart(alt.Chart(payment_bar_data).mark_bar().encode(x="Payment Type", y="size", color=alt.Color("color").scale(None)).properties(height=500), use_container_width=True)
 
     # Map
     payment_map_data = data[data["Company"] == selected_company].groupby(["latitude", "longitude"], as_index=False)["Payment Type"].agg(pd.Series.mode)
     payment_map_data["Payment Type"] = payment_map_data["Payment Type"].map(lambda val : val if(isinstance(val, str)) else val[0])
-    payment_map_data["color"] = payment_map_data.apply(apply_color, 1)
+    payment_map_data["color"] = payment_map_data.apply(apply_color_payment, 1)
 
     st.map(payment_map_data, color="color", size=300)
 
@@ -228,14 +241,14 @@ else:
 
         # Bar chart
         payment_bar_data = data.groupby(["Payment Type"], as_index=False).size();
-        payment_bar_data["color"] = payment_bar_data.apply(apply_color, axis=1)
+        payment_bar_data["color"] = payment_bar_data.apply(apply_color_payment, axis=1)
 
         st.altair_chart(alt.Chart(payment_bar_data).mark_bar().encode(x="Payment Type", y=alt.Y("size", title="Times used"), color=alt.Color("color").scale(None)).properties(height=500), use_container_width=True)
 
         # Map
         payment_map_data = data.groupby(["latitude", "longitude"], as_index=False)["Payment Type"].agg(pd.Series.mode)
         payment_map_data["Payment Type"] = payment_map_data["Payment Type"].map(lambda val : val if(isinstance(val, str)) else val[0])
-        payment_map_data["color"] = payment_map_data.apply(apply_color, 1)
+        payment_map_data["color"] = payment_map_data.apply(apply_color_payment, 1)
 
         st.map(payment_map_data, color="color", size=300)
 
@@ -390,5 +403,35 @@ else:
         st.altair_chart(alt.Chart(average_distance_data).mark_bar().encode(x=alt.X("Company", sort="-y"), y=alt.Y("Trip Miles", title="Average distance (miles)"), color=alt.Color("Company", legend=None)).properties(height=500), use_container_width=True)
 
     with weekdays_tab:
+        sort_order = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        companies_to_keep = data.groupby(["Company"], as_index=False).size().sort_values(by=["size"], ascending=False)[:15]["Company"]
+
+        weekday_with_most_trips_per_location = data.groupby(["latitude", "longitude"], as_index=False)["Weekday"].agg(pd.Series.mode)
+        weekday_with_most_trips_per_location["Weekday"] = weekday_with_most_trips_per_location["Weekday"].map(lambda val : val if(isinstance(val, str)) else val[0])
+        weekday_with_most_trips_per_location["color"] = weekday_with_most_trips_per_location.apply(apply_color_weekday, 1)
+        st.map(weekday_with_most_trips_per_location, color="color", size=300)
+
         trips_per_weekday_data = data.groupby(["Weekday"], as_index=False).size()
-        st.altair_chart(alt.Chart(trips_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort="-y"), y=alt.Y("size", title="Trips completed"), color=alt.Color("Weekday", legend=None)).properties(height=500), use_container_width=True)
+        st.altair_chart(alt.Chart(trips_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), y=alt.Y("size", title="Trips completed"), color=alt.Color("Weekday", legend=None)).properties(height=500), use_container_width=True)
+
+        amount_per_weekday_data = data.groupby(["Weekday"], as_index=False)["Trip Total"].sum()
+        st.altair_chart(alt.Chart(amount_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), y=alt.Y("Trip Total", title="Amount made (dollars)"), color=alt.Color("Weekday", legend=None)).properties(height=500), use_container_width=True)
+
+        average_fare_per_weekday_data = data.groupby(["Weekday"], as_index=False)["Fare"].mean()
+        st.altair_chart(alt.Chart(average_fare_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), y=alt.Y("Fare", title="Average fare (dollars)"), color=alt.Color("Weekday", legend=None)).properties(height=500), use_container_width=True)
+
+        average_tip_per_weekday_data = data.groupby(["Weekday"], as_index=False)["Tips"].mean()
+        st.altair_chart(alt.Chart(average_tip_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), y=alt.Y("Tips", title="Average tip (dollars)"), color=alt.Color("Weekday", legend=None)).properties(height=500), use_container_width=True)
+
+        average_duration_per_weekday_data = data.groupby(["Weekday"], as_index=False)["Trip Seconds"].mean()
+        st.altair_chart(alt.Chart(average_duration_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), y=alt.Y("Trip Seconds", title="Average duration (seconds)"), color=alt.Color("Weekday", legend=None)).properties(height=500), use_container_width=True)
+
+        company_trips_per_weekday_data = data[data["Company"].isin(companies_to_keep)].groupby(["Weekday", "Company"], as_index=False).size()
+        st.altair_chart(alt.Chart(company_trips_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), xOffset="Company", y=alt.Y("size", title="Trips Completed"), color=alt.Color("Company")).properties(height=500), use_container_width=True)
+
+        company_amount_per_weekday_data = data[data["Company"].isin(companies_to_keep)].groupby(["Weekday", "Company"], as_index=False)["Trip Total"].sum()
+        st.altair_chart(alt.Chart(company_amount_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), xOffset="Company", y=alt.Y("Trip Total", title="Amount made (dollars)"), color=alt.Color("Company")).properties(height=500), use_container_width=True)
+
+        payment_type_per_weekday_data = data.groupby(["Weekday", "Payment Type"], as_index=False).size()
+        st.altair_chart(alt.Chart(payment_type_per_weekday_data).mark_bar().encode(x=alt.X("Weekday", sort=sort_order), xOffset="Payment Type", y=alt.Y("size", title="Times used"), color=alt.Color("Payment Type")).properties(height=500), use_container_width=True)
+
